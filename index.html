@@ -1,0 +1,2045 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐾 毛孩樂園 - 寵物分享交流平台</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@400;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --cream: #FFF8F0;
+      --peach: #FFB347;
+      --peach-light: #FFD699;
+      --coral: #FF7A6B;
+      --mint: #7ECBA1;
+      --mint-light: #B8E8CC;
+      --sky: #87CEEB;
+      --lavender: #C3A8E0;
+      --brown: #8B5E3C;
+      --brown-light: #C8956A;
+      --white: #FFFFFF;
+      --text-dark: #3D2B1F;
+      --text-mid: #7A5C44;
+      --text-light: #B8967A;
+      --shadow: 0 8px 30px rgba(139, 94, 60, 0.15);
+      --shadow-hover: 0 12px 40px rgba(139, 94, 60, 0.25);
+      --radius: 24px;
+      --radius-sm: 14px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--cream);
+      color: var(--text-dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ===== BACKGROUND DECORATION ===== */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(255, 179, 71, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(126, 203, 161, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(195, 168, 224, 0.08) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .paw-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+      opacity: 0.04;
+    }
+
+    .paw-bg span {
+      position: absolute;
+      font-size: 60px;
+      animation: floatPaw 8s ease-in-out infinite;
+    }
+
+    @keyframes floatPaw {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-20px) rotate(15deg);
+      }
+    }
+
+    /* ===== PAGES ===== */
+    .page {
+      display: none;
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+    }
+
+    .page.active {
+      display: block;
+      animation: pageIn 0.4s ease;
+    }
+
+    @keyframes pageIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ===== NAV ===== */
+    .navbar {
+      background: var(--white);
+      box-shadow: 0 4px 20px rgba(139, 94, 60, 0.1);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 3px solid var(--peach-light);
+    }
+
+    .nav-logo {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--coral);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .nav-logo span {
+      font-size: 1.6rem;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      background: none;
+      border: 2.5px solid var(--peach);
+      color: var(--brown);
+      padding: 8px 18px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      transition: all 0.25s;
+    }
+
+    .nav-btn:hover {
+      background: var(--peach);
+      color: var(--white);
+      transform: translateY(-2px);
+    }
+
+    .nav-btn.primary {
+      background: var(--coral);
+      border-color: var(--coral);
+      color: var(--white);
+    }
+
+    .nav-btn.primary:hover {
+      background: #e86a5a;
+      transform: translateY(-2px);
+    }
+
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 3px solid var(--peach);
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .nav-avatar:hover {
+      transform: scale(1.1);
+    }
+
+    .nav-username {
+      font-weight: 700;
+      color: var(--text-mid);
+      font-size: 0.95rem;
+    }
+
+    /* ===== AUTH PAGE ===== */
+    #page-auth {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #FFF0E0 0%, #E8F8EE 50%, #F0EAFF 100%);
+    }
+
+    .auth-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 40px;
+      width: 100%;
+      max-width: 440px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--coral), var(--peach), var(--mint));
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 0;
+      background: var(--cream);
+      border-radius: 50px;
+      padding: 4px;
+      margin-bottom: 28px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-radius: 50px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-mid);
+      transition: all 0.25s;
+    }
+
+    .auth-tab.active {
+      background: var(--coral);
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(255, 122, 107, 0.4);
+    }
+
+    .auth-title {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .auth-sub {
+      text-align: center;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--text-mid);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2.5px solid #EDD9CC;
+      border-radius: var(--radius-sm);
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      background: var(--cream);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--peach);
+      box-shadow: 0 0 0 3px rgba(255, 179, 71, 0.2);
+      background: var(--white);
+    }
+
+    /* avatar upload */
+    .avatar-upload {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .avatar-preview {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 3px dashed var(--peach);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--cream);
+      font-size: 2rem;
+      overflow: hidden;
+      flex-shrink: 0;
+      transition: border-color 0.2s;
+    }
+
+    .avatar-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-upload-btn {
+      flex: 1;
+      padding: 10px 16px;
+      border: 2px dashed var(--peach);
+      border-radius: var(--radius-sm);
+      background: var(--cream);
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      color: var(--text-mid);
+      font-size: 0.88rem;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .avatar-upload-btn:hover {
+      background: var(--peach-light);
+      border-color: var(--peach);
+    }
+
+    .btn-main {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--coral), #FF9A8B);
+      border: none;
+      border-radius: 50px;
+      color: var(--white);
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 6px 20px rgba(255, 122, 107, 0.35);
+    }
+
+    .btn-main:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(255, 122, 107, 0.45);
+    }
+
+    .btn-main:active {
+      transform: translateY(-1px);
+    }
+
+    .error-msg {
+      background: #FFF0EE;
+      border: 2px solid #FFB8B2;
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      color: var(--coral);
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    .success-msg {
+      background: #F0FFF6;
+      border: 2px solid var(--mint-light);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      color: var(--mint);
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    /* captcha */
+    .captcha-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .captcha-img-wrapper {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .captcha-img-wrapper.selected {
+      border-color: var(--coral);
+      transform: scale(0.95);
+    }
+    .captcha-img-wrapper.selected::after {
+      content: '✔';
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: var(--coral);
+      color: var(--white);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+    .captcha-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ===== HOME PAGE ===== */
+    #page-home {
+      padding: 0;
+    }
+
+    .home-hero {
+      background: linear-gradient(135deg, #FFE8D6 0%, #E8F8EE 100%);
+      padding: 40px 24px 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .home-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: var(--cream);
+      clip-path: ellipse(55% 100% at 50% 100%);
+    }
+
+    .hero-welcome {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .hero-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 4px solid var(--white);
+      box-shadow: 0 8px 24px rgba(255, 122, 107, 0.3);
+      object-fit: cover;
+    }
+
+    .hero-text h1 {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .hero-text p {
+      color: var(--text-mid);
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+
+    .home-content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* new post btn */
+    .new-post-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--coral), var(--peach));
+      border: none;
+      border-radius: 50px;
+      padding: 12px 24px;
+      color: var(--white);
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 0.95rem;
+      box-shadow: 0 6px 20px rgba(255, 122, 107, 0.35);
+      transition: all 0.25s;
+    }
+
+    .new-post-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(255, 122, 107, 0.45);
+    }
+
+    .new-post-btn .plus {
+      font-size: 1.3rem;
+    }
+
+    /* my posts */
+    .my-posts-empty {
+      text-align: center;
+      padding: 48px 20px;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .my-posts-empty .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 12px;
+    }
+
+    .my-posts-empty p {
+      color: var(--text-light);
+      font-size: 0.95rem;
+    }
+
+    /* ===== SHARE PAGE ===== */
+    #page-share {
+      padding: 0;
+    }
+
+    .share-header {
+      background: linear-gradient(135deg, var(--mint-light) 0%, var(--sky) 100%);
+      padding: 32px 24px 50px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .share-header::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: var(--cream);
+      clip-path: ellipse(55% 100% at 50% 100%);
+    }
+
+    .share-header h2 {
+      font-family: 'Baloo 2', cursive;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .share-header p {
+      color: var(--text-mid);
+      margin-top: 6px;
+    }
+
+    .share-content {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+
+    .posts-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ===== POST CARD ===== */
+    .post-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: transform 0.25s, box-shadow 0.25s;
+      animation: cardIn 0.4s ease;
+    }
+
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .post-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .post-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px 12px;
+      border-bottom: 2px solid var(--cream);
+    }
+
+    .post-author-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 3px solid var(--peach-light);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .post-author-info {}
+
+    .post-author-name {
+      font-weight: 800;
+      color: var(--text-dark);
+      font-size: 0.95rem;
+    }
+
+    .post-author-id {
+      color: var(--text-light);
+      font-size: 0.82rem;
+    }
+
+    .post-time {
+      margin-left: auto;
+      color: var(--text-light);
+      font-size: 0.8rem;
+    }
+
+    .post-card-body {
+      padding: 16px 20px;
+    }
+
+    .post-topic {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+
+    .post-content {
+      color: var(--text-mid);
+      font-size: 0.92rem;
+      line-height: 1.65;
+    }
+
+    .post-image {
+      width: 100%;
+      max-height: 320px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      margin-top: 12px;
+      display: block;
+    }
+
+    .post-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-top: 2px solid var(--cream);
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--cream);
+      border: none;
+      border-radius: 50px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--text-mid);
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      background: var(--peach-light);
+      color: var(--brown);
+    }
+
+    .action-btn.liked {
+      background: #FFF0EE;
+      color: var(--coral);
+    }
+
+    .action-btn .icon {
+      font-size: 1.1rem;
+    }
+
+    /* comments section */
+    .comments-section {
+      padding: 0 20px 16px;
+      display: none;
+    }
+
+    .comments-section.open {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .comment-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .comment-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: var(--cream);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+    }
+
+    .comment-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--peach-light);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .comment-body {}
+
+    .comment-author {
+      font-weight: 800;
+      font-size: 0.83rem;
+      color: var(--text-dark);
+    }
+
+    .comment-text {
+      font-size: 0.88rem;
+      color: var(--text-mid);
+      margin-top: 2px;
+    }
+
+    .comment-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .comment-input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 2.5px solid #EDD9CC;
+      border-radius: 50px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.88rem;
+      color: var(--text-dark);
+      background: var(--cream);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .comment-input:focus {
+      border-color: var(--peach);
+      background: var(--white);
+    }
+
+    .comment-send {
+      background: var(--coral);
+      border: none;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .comment-send:hover {
+      background: #e86a5a;
+      transform: scale(1.1);
+    }
+
+    /* no comment login prompt */
+    .login-prompt {
+      background: linear-gradient(135deg, #FFF0E0, #E8F8EE);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      text-align: center;
+    }
+
+    .login-prompt p {
+      color: var(--text-mid);
+      font-size: 0.88rem;
+      margin-bottom: 10px;
+    }
+
+    .login-prompt-btns {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .lp-btn {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .lp-btn.yes {
+      background: var(--coral);
+      color: var(--white);
+    }
+
+    .lp-btn.yes:hover {
+      background: #e86a5a;
+    }
+
+    .lp-btn.no {
+      background: var(--cream);
+      color: var(--text-mid);
+      border: 2px solid #EDD9CC;
+    }
+
+    .lp-btn.no:hover {
+      background: #EDD9CC;
+    }
+
+    /* ===== NEW POST PAGE ===== */
+    #page-newpost {
+      padding: 0;
+    }
+
+    .newpost-header {
+      background: linear-gradient(135deg, var(--lavender) 0%, #FFD6E0 100%);
+      padding: 28px 24px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .newpost-header::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: var(--cream);
+      clip-path: ellipse(55% 100% at 50% 100%);
+    }
+
+    .newpost-header h2 {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .newpost-content {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+
+    .newpost-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .np-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 3px solid var(--peach);
+      object-fit: cover;
+    }
+
+    .np-name {
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .np-id {
+      color: var(--text-light);
+      font-size: 0.85rem;
+    }
+
+    .post-form {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .post-form textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2.5px solid #EDD9CC;
+      border-radius: var(--radius-sm);
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      background: var(--cream);
+      outline: none;
+      resize: vertical;
+      min-height: 120px;
+      transition: border-color 0.2s;
+    }
+
+    .post-form textarea:focus {
+      border-color: var(--peach);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(255, 179, 71, 0.2);
+    }
+
+    .img-upload-area {
+      border: 2.5px dashed var(--peach);
+      border-radius: var(--radius-sm);
+      padding: 28px;
+      text-align: center;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: all 0.2s;
+      background: var(--cream);
+    }
+
+    .img-upload-area:hover {
+      background: var(--peach-light);
+      border-color: var(--brown-light);
+    }
+
+    .img-upload-area .upload-icon {
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+    }
+
+    .img-upload-area p {
+      color: var(--text-mid);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .img-upload-area small {
+      color: var(--text-light);
+      font-size: 0.8rem;
+    }
+
+    .img-preview-wrap {
+      position: relative;
+      display: inline-block;
+      margin-top: 12px;
+    }
+
+    .img-preview {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: var(--radius-sm);
+      display: block;
+    }
+
+    .img-remove {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--coral);
+      color: var(--white);
+      border: none;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(255, 122, 107, 0.4);
+    }
+
+    .post-actions-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      justify-content: flex-end;
+    }
+
+    .btn-cancel {
+      padding: 12px 24px;
+      background: var(--cream);
+      border: 2px solid #EDD9CC;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      color: var(--text-mid);
+      transition: all 0.2s;
+    }
+
+    .btn-cancel:hover {
+      background: #EDD9CC;
+    }
+
+    .btn-publish {
+      padding: 12px 28px;
+      background: linear-gradient(135deg, var(--mint), #5BB88A);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      color: var(--white);
+      box-shadow: 0 6px 20px rgba(126, 203, 161, 0.4);
+      transition: all 0.25s;
+    }
+
+    .btn-publish:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(126, 203, 161, 0.5);
+    }
+
+    /* ===== BOTTOM NAV ===== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--white);
+      border-top: 3px solid var(--peach-light);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0;
+      box-shadow: 0 -4px 20px rgba(139, 94, 60, 0.1);
+      z-index: 100;
+    }
+
+    .bottom-nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 16px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-light);
+      transition: color 0.2s;
+    }
+
+    .bottom-nav-btn .bnb-icon {
+      font-size: 1.5rem;
+    }
+
+    .bottom-nav-btn.active {
+      color: var(--coral);
+    }
+
+    .bottom-nav-btn:hover {
+      color: var(--coral);
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--text-dark);
+      color: var(--white);
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 999;
+      transition: all 0.3s;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(61, 43, 31, 0.5);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.open {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    .modal-box {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      max-width: 380px;
+      width: 90%;
+      text-align: center;
+      box-shadow: var(--shadow-hover);
+      animation: popIn 0.3s ease;
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(0.8)
+      }
+
+      to {
+        transform: scale(1)
+      }
+    }
+
+    .modal-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+
+    .modal-body {
+      color: var(--text-mid);
+      font-size: 0.92rem;
+      margin-bottom: 20px;
+    }
+
+    .modal-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .modal-btn {
+      padding: 11px 24px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .modal-btn.yes {
+      background: var(--coral);
+      color: var(--white);
+      box-shadow: 0 4px 14px rgba(255, 122, 107, 0.35);
+    }
+
+    .modal-btn.yes:hover {
+      background: #e86a5a;
+    }
+
+    .modal-btn.no {
+      background: var(--cream);
+      color: var(--text-mid);
+      border: 2px solid #EDD9CC;
+    }
+
+    .modal-btn.no:hover {
+      background: #EDD9CC;
+    }
+
+    /* padding for bottom nav */
+    .with-nav {
+      padding-bottom: 72px;
+    }
+
+    /* post card in home */
+    .mini-post-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      animation: cardIn 0.4s ease;
+    }
+
+    .mini-post-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .mini-post-icon {
+      font-size: 1.8rem;
+      flex-shrink: 0;
+    }
+
+    .mini-post-topic {
+      font-weight: 800;
+      color: var(--text-dark);
+      font-size: 0.95rem;
+    }
+
+    .mini-post-content {
+      color: var(--text-mid);
+      font-size: 0.85rem;
+      margin-top: 3px;
+      line-height: 1.5;
+    }
+
+    .mini-post-time {
+      color: var(--text-light);
+      font-size: 0.78rem;
+      margin-top: 4px;
+    }
+
+    /* empty feed */
+    .feed-empty {
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .feed-empty .empty-emoji {
+      font-size: 4rem;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .feed-empty p {
+      color: var(--text-light);
+      font-size: 0.95rem;
+    }
+
+    @media(max-width:600px) {
+      .auth-card {
+        padding: 28px 20px;
+      }
+
+      .home-content,
+      .share-content,
+      .newpost-content {
+        padding: 24px 12px;
+      }
+
+      .nav-logo {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Floating paw bg -->
+  <div class="paw-bg" id="pawBg"></div>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" id="navbar" style="display:none">
+    <div class="nav-logo" onclick="goHome()">
+      <span>🐾</span> 毛孩樂園
+    </div>
+    <div class="nav-links" id="navLinks"></div>
+  </nav>
+
+  <!-- ===== AUTH PAGE ===== -->
+  <div class="page active" id="page-auth">
+    <div
+      style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px;background:linear-gradient(135deg,#FFF0E0 0%,#E8F8EE 50%,#F0EAFF 100%);">
+      <div class="auth-card">
+        <div style="text-align:center;margin-bottom:20px;">
+          <div style="font-size:3rem;margin-bottom:8px;">🐾</div>
+          <div style="font-family:'Baloo 2',cursive;font-size:1.9rem;font-weight:800;color:var(--coral);">毛孩樂園</div>
+          <div style="color:var(--text-light);font-size:0.88rem;">寵物主人的溫暖小窩</div>
+        </div>
+
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">🔑 登入</button>
+          <button class="auth-tab" id="tab-register" onclick="switchTab('register')">🌟 註冊</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <div id="form-login">
+          <div class="error-msg" id="login-error"></div>
+          <div class="success-msg" id="login-success"></div>
+          <div class="form-group">
+            <label class="form-label">帳號 ID</label>
+            <input class="form-input" id="login-id" type="text" placeholder="請輸入你的 ID" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">密碼</label>
+            <input class="form-input" id="login-pw" type="password" placeholder="請輸入密碼" />
+          </div>
+          <button class="btn-main" onclick="doLogin()">🐾 登入毛孩樂園</button>
+          <p style="text-align:center;margin-top:14px;color:var(--text-light);font-size:0.85rem;">還沒有帳號？<a
+              onclick="switchTab('register')" style="color:var(--coral);cursor:pointer;font-weight:700;">立即註冊 ✨</a></p>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div id="form-register" style="display:none">
+          <div class="error-msg" id="reg-error"></div>
+          <div class="success-msg" id="reg-success"></div>
+          <div class="form-group">
+            <label class="form-label">帳號 ID（登入用）</label>
+            <input class="form-input" id="reg-id" type="text" placeholder="設定唯一的帳號 ID" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">暱稱</label>
+            <input class="form-input" id="reg-name" type="text" placeholder="大家看到的名稱" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">密碼</label>
+            <input class="form-input" id="reg-pw" type="password" placeholder="設定登入密碼" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">頭貼（選填）</label>
+            <div class="avatar-upload">
+              <div class="avatar-preview" id="reg-avatar-preview">🐶</div>
+              <div>
+                <label class="avatar-upload-btn" for="reg-avatar-file">📷 上傳頭貼</label>
+                <input type="file" id="reg-avatar-file" accept="image/*" style="display:none"
+                  onchange="previewAvatar(this,'reg-avatar-preview','reg-avatar-data')">
+                <input type="hidden" id="reg-avatar-data">
+                <p style="color:var(--text-light);font-size:0.78rem;margin-top:6px;">支援 JPG、PNG、GIF</p>
+              </div>
+            </div>
+          </div>
+          <button class="btn-main" onclick="doRegister()">🌟 建立我的帳號</button>
+          <p style="text-align:center;margin-top:14px;color:var(--text-light);font-size:0.85rem;">已有帳號？<a
+              onclick="switchTab('login')" style="color:var(--coral);cursor:pointer;font-weight:700;">直接登入 🔑</a></p>
+        </div>
+
+        <!-- CAPTCHA FORM -->
+        <div id="form-captcha" style="display:none">
+          <h3 style="text-align:center;color:var(--text-dark);margin-bottom:12px;font-family:'Baloo 2',cursive;">🐾 選取包含貓咪的照片</h3>
+          <div class="error-msg" id="captcha-error"></div>
+          <div class="captcha-grid" id="captcha-grid"></div>
+          <button class="btn-main" onclick="verifyCaptcha()">🔒 驗證</button>
+          <p style="text-align:center;margin-top:14px;"><a onclick="switchTab('login')" style="color:var(--text-mid);cursor:pointer;font-weight:700;">返回重新登入</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HOME PAGE ===== -->
+  <div class="page" id="page-home">
+    <div class="home-hero">
+      <div class="hero-welcome">
+        <img class="hero-avatar" id="hero-avatar" src="" alt="avatar">
+        <div class="hero-text">
+          <h1 id="hero-greeting">歡迎回來！</h1>
+          <p id="hero-sub">今天分享你的毛孩故事吧 🐾</p>
+        </div>
+      </div>
+    </div>
+    <div class="home-content with-nav">
+      <div class="section-header">
+        <div class="section-title">📝 我的貼文</div>
+        <button class="new-post-btn" onclick="goNewPost()">
+          <span class="plus">+</span> 新增貼文
+        </button>
+      </div>
+      <div id="my-posts-container">
+        <div class="my-posts-empty">
+          <div class="empty-icon">🌿</div>
+          <p>還沒有貼文，快來分享你的毛孩故事！</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SHARE PAGE ===== -->
+  <div class="page" id="page-share">
+    <div class="share-header">
+      <h2>🐾 毛孩分享廣場</h2>
+      <p>看看大家的可愛毛孩故事</p>
+    </div>
+    <div class="share-content with-nav">
+      <div class="posts-feed" id="posts-feed"></div>
+    </div>
+  </div>
+
+  <!-- ===== NEW POST PAGE ===== -->
+  <div class="page" id="page-newpost">
+    <div class="newpost-header">
+      <h2>✍️ 發布新貼文</h2>
+    </div>
+    <div class="newpost-content with-nav">
+      <div class="newpost-author">
+        <img class="np-avatar" id="np-avatar" src="" alt="">
+        <div>
+          <div class="np-name" id="np-name"></div>
+          <div class="np-id" id="np-id"></div>
+        </div>
+      </div>
+      <div class="post-form">
+        <div class="form-group">
+          <label class="form-label">📌 發布主題</label>
+          <input class="form-input" id="post-topic" placeholder="今天想分享什麼主題？" />
+        </div>
+        <div class="form-group" style="margin-top:12px">
+          <label class="form-label">💬 發布內容</label>
+          <textarea id="post-content" placeholder="說說你的毛孩故事..."></textarea>
+        </div>
+        <div>
+          <label class="form-label">🖼 上傳照片（選填）</label>
+          <label class="img-upload-area" for="post-img-file" id="img-upload-label">
+            <div class="upload-icon">📸</div>
+            <p>點擊上傳照片</p>
+            <small>支援 JPG、PNG、GIF</small>
+          </label>
+          <input type="file" id="post-img-file" accept="image/*" style="display:none" onchange="previewPostImg(this)">
+          <div id="post-img-preview-wrap" style="display:none">
+            <div class="img-preview-wrap">
+              <img class="img-preview" id="post-img-preview" src="" alt="">
+              <button class="img-remove" onclick="removePostImg()">✕</button>
+            </div>
+          </div>
+        </div>
+        <div class="post-actions-row">
+          <button class="btn-cancel" onclick="goHome()">取消</button>
+          <button class="btn-publish" onclick="publishPost()">🚀 發布貼文</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BOTTOM NAV ===== -->
+  <nav class="bottom-nav" id="bottom-nav" style="display:none">
+    <button class="bottom-nav-btn" id="bnb-home" onclick="goPage('home')">
+      <span class="bnb-icon">🏠</span>個人首頁
+    </button>
+    <button class="bottom-nav-btn" id="bnb-share" onclick="goPage('share')">
+      <span class="bnb-icon">🐾</span>分享廣場
+    </button>
+    <button class="bottom-nav-btn" id="bnb-logout" onclick="doLogout()">
+      <span class="bnb-icon">👋</span>登出
+    </button>
+  </nav>
+
+  <!-- Guest nav (not logged in, viewing share) -->
+  <nav class="bottom-nav" id="guest-nav" style="display:none">
+    <button class="bottom-nav-btn active" onclick="goGuestShare()">
+      <span class="bnb-icon">🐾</span>分享廣場
+    </button>
+    <button class="bottom-nav-btn" onclick="goPage('auth')">
+      <span class="bnb-icon">🔑</span>登入 / 註冊
+    </button>
+  </nav>
+
+  <!-- ===== MODAL ===== -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-box">
+      <div class="modal-icon" id="modal-icon">🐾</div>
+      <div class="modal-title" id="modal-title"></div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-btns" id="modal-btns"></div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ===== INIT =====
+    const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="40" fill="%23FFD699"/><text x="40" y="52" text-anchor="middle" font-size="36">🐶</text></svg>';
+
+    let state = {
+      currentUser: null,
+      users: JSON.parse(localStorage.getItem('pet_users') || '[]'),
+      posts: JSON.parse(localStorage.getItem('pet_posts') || '[]'),
+      currentPage: 'auth'
+    };
+
+    function save() {
+      localStorage.setItem('pet_users', JSON.stringify(state.users));
+      localStorage.setItem('pet_posts', JSON.stringify(state.posts));
+    }
+
+    // ===== PAW BG =====
+    (function () {
+      const bg = document.getElementById('pawBg');
+      const paws = ['🐾', '🐶', '🐱', '🐰', '🐹', '🐻', '🦊', '🐨'];
+      for (let i = 0; i < 12; i++) {
+        const el = document.createElement('span');
+        el.textContent = paws[Math.floor(Math.random() * paws.length)];
+        el.style.left = Math.random() * 100 + '%';
+        el.style.top = Math.random() * 100 + '%';
+        el.style.animationDelay = Math.random() * 6 + 's';
+        el.style.animationDuration = (6 + Math.random() * 4) + 's';
+        el.style.fontSize = (40 + Math.random() * 40) + 'px';
+        bg.appendChild(el);
+      }
+    })();
+
+    // ===== AUTH =====
+    let pendingUser = null;
+
+    function switchTab(tab) {
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+      document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';
+      document.getElementById('form-register').style.display = tab === 'register' ? '' : 'none';
+      const formCaptcha = document.getElementById('form-captcha');
+      if (formCaptcha) formCaptcha.style.display = 'none';
+      pendingUser = null;
+      clearMessages();
+    }
+    function clearMessages() {
+      ['login-error', 'login-success', 'reg-error', 'reg-success', 'captcha-error'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.style.display = 'none';
+      });
+    }
+    function showMsg(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = msg; el.style.display = 'block';
+    }
+
+    function previewAvatar(input, previewId, dataId) {
+      const file = input.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const preview = document.getElementById(previewId);
+        preview.innerHTML = '<img src="' + e.target.result + '">';
+        if (dataId) document.getElementById(dataId).value = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function doRegister() {
+      clearMessages();
+      const id = document.getElementById('reg-id').value.trim();
+      const name = document.getElementById('reg-name').value.trim();
+      const pw = document.getElementById('reg-pw').value;
+      const avatar = document.getElementById('reg-avatar-data').value || DEFAULT_AVATAR;
+
+      if (!id || !name || !pw) return showMsg('reg-error', '⚠️ 請填寫所有必填欄位！');
+      if (id.length < 3) return showMsg('reg-error', '⚠️ ID 至少需要 3 個字元');
+      if (pw.length < 4) return showMsg('reg-error', '⚠️ 密碼至少需要 4 個字元');
+      if (state.users.find(u => u.id === id)) return showMsg('reg-error', '⚠️ 此 ID 已被使用，請換一個！');
+
+      state.users.push({ id, name, pw, avatar });
+      save();
+      showMsg('reg-success', '🎉 註冊成功！請登入~');
+      setTimeout(() => { switchTab('login'); document.getElementById('login-id').value = id; }, 1200);
+    }
+
+    function doLogin() {
+      clearMessages();
+      const id = document.getElementById('login-id').value.trim();
+      const pw = document.getElementById('login-pw').value;
+      const user = state.users.find(u => u.id === id && u.pw === pw);
+      if (!user) return showMsg('login-error', '⚠️ 帳號或密碼錯誤，請再試一次！');
+      
+      pendingUser = user;
+      document.getElementById('form-login').style.display = 'none';
+      document.getElementById('form-captcha').style.display = '';
+      renderCaptcha();
+    }
+
+    const captchaImages = [
+      { id: 1, src: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=200&h=200&fit=crop', isCat: true },
+      { id: 2, src: 'https://images.unsplash.com/photo-1495360010541-f48722b34f7d?w=200&h=200&fit=crop', isCat: true },
+      { id: 3, src: 'https://images.unsplash.com/photo-1533743983669-94fa5c4338ec?w=200&h=200&fit=crop', isCat: true },
+      { id: 4, src: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?w=200&h=200&fit=crop', isCat: false },
+      { id: 5, src: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=200&h=200&fit=crop', isCat: false },
+      { id: 6, src: 'https://images.unsplash.com/photo-1585110396000-c9fd4e4e5030?w=200&h=200&fit=crop', isCat: false },
+      { id: 7, src: 'https://images.unsplash.com/photo-1522926193341-e9eb1704c443?w=200&h=200&fit=crop', isCat: false },
+      { id: 8, src: 'https://images.unsplash.com/photo-1425082661705-1834bfd0999c?w=200&h=200&fit=crop', isCat: false },
+      { id: 9, src: 'https://images.unsplash.com/photo-1437622368342-7a3d73a34c8f?w=200&h=200&fit=crop', isCat: false }
+    ];
+    let selectedCaptchaIds = [];
+
+    function renderCaptcha() {
+      const grid = document.getElementById('captcha-grid');
+      selectedCaptchaIds = [];
+      const shuffled = [...captchaImages].sort(() => Math.random() - 0.5);
+      
+      grid.innerHTML = shuffled.map(img => `
+        <div class="captcha-img-wrapper" id="cimg-${img.id}" onclick="toggleCaptchaImg(${img.id})">
+          <img class="captcha-img" src="${img.src}" alt="animal">
+        </div>
+      `).join('');
+    }
+
+    function toggleCaptchaImg(id) {
+      const el = document.getElementById('cimg-' + id);
+      if (selectedCaptchaIds.includes(id)) {
+        selectedCaptchaIds = selectedCaptchaIds.filter(x => x !== id);
+        el.classList.remove('selected');
+      } else {
+        selectedCaptchaIds.push(id);
+        el.classList.add('selected');
+      }
+    }
+
+    function verifyCaptcha() {
+      clearMessages();
+      if (!pendingUser) return switchTab('login');
+      
+      const selectedImages = captchaImages.filter(img => selectedCaptchaIds.includes(img.id));
+      const isCorrect = selectedImages.length === 3 && selectedImages.every(img => img.isCat);
+      
+      if (!isCorrect) {
+        renderCaptcha(); // reshuffle on error
+        return showMsg('captcha-error', '⚠️ 選取錯誤！請確認只選了 3 張貓咪照片。');
+      }
+      
+      state.currentUser = pendingUser;
+      pendingUser = null;
+      enterApp();
+    }
+
+    function doLogout() {
+      state.currentUser = null;
+      showPage('auth');
+      document.getElementById('navbar').style.display = 'none';
+      document.getElementById('bottom-nav').style.display = 'none';
+      document.getElementById('guest-nav').style.display = 'none';
+      showToast('👋 已成功登出，掰掰～');
+    }
+
+    // ===== APP ENTER =====
+    function enterApp() {
+      document.getElementById('navbar').style.display = 'flex';
+      document.getElementById('bottom-nav').style.display = 'flex';
+      document.getElementById('guest-nav').style.display = 'none';
+      updateNavUser();
+      goHome();
+    }
+
+    function updateNavUser() {
+      const u = state.currentUser;
+      if (!u) return;
+      document.getElementById('navLinks').innerHTML = `
+    <div class="nav-user">
+      <img class="nav-avatar" src="${u.avatar || DEFAULT_AVATAR}" alt="">
+      <span class="nav-username">${u.name}</span>
+    </div>
+  `;
+    }
+
+    // ===== NAVIGATION =====
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+      state.currentPage = id;
+      document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
+      if (id === 'home') document.getElementById('bnb-home')?.classList.add('active');
+      if (id === 'share') document.getElementById('bnb-share')?.classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    function goPage(id) {
+      if (id === 'home') goHome();
+      else if (id === 'share') goShare();
+      else showPage(id);
+    }
+
+    function goHome() {
+      if (!state.currentUser) return;
+      const u = state.currentUser;
+      document.getElementById('hero-greeting').textContent = `歡迎回來，${u.name}！`;
+      document.getElementById('hero-sub').textContent = '今天分享你的毛孩故事吧 🐾';
+      const heroAvatar = document.getElementById('hero-avatar');
+      heroAvatar.src = u.avatar || DEFAULT_AVATAR;
+      renderMyPosts();
+      showPage('home');
+    }
+
+    function goShare() {
+      renderFeed();
+      showPage('share');
+    }
+
+    function goGuestShare() {
+      renderFeed();
+      showPage('share');
+    }
+
+    function goNewPost() {
+      const u = state.currentUser; if (!u) return;
+      document.getElementById('np-avatar').src = u.avatar || DEFAULT_AVATAR;
+      document.getElementById('np-name').textContent = u.name;
+      document.getElementById('np-id').textContent = '@' + u.id;
+      document.getElementById('post-topic').value = '';
+      document.getElementById('post-content').value = '';
+      document.getElementById('post-img-preview-wrap').style.display = 'none';
+      document.getElementById('img-upload-label').style.display = '';
+      document.getElementById('post-img-file').value = '';
+      showPage('newpost');
+    }
+
+    // Guest share access
+    function openGuestShare() {
+      document.getElementById('navbar').style.display = 'none';
+      document.getElementById('bottom-nav').style.display = 'none';
+      document.getElementById('guest-nav').style.display = 'flex';
+      renderFeed();
+      showPage('share');
+    }
+
+    // ===== POST =====
+    let postImgData = '';
+
+    function previewPostImg(input) {
+      const file = input.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        postImgData = e.target.result;
+        document.getElementById('post-img-preview').src = e.target.result;
+        document.getElementById('post-img-preview-wrap').style.display = 'block';
+        document.getElementById('img-upload-label').style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removePostImg() {
+      postImgData = '';
+      document.getElementById('post-img-preview-wrap').style.display = 'none';
+      document.getElementById('img-upload-label').style.display = '';
+      document.getElementById('post-img-file').value = '';
+    }
+
+    function publishPost() {
+      const topic = document.getElementById('post-topic').value.trim();
+      const content = document.getElementById('post-content').value.trim();
+      if (!topic) return showToast('⚠️ 請填寫發布主題！');
+      if (!content) return showToast('⚠️ 請填寫發布內容！');
+
+      const u = state.currentUser;
+      const post = {
+        id: Date.now().toString(),
+        authorId: u.id,
+        authorName: u.name,
+        authorAvatar: u.avatar || DEFAULT_AVATAR,
+        topic, content,
+        image: postImgData,
+        time: new Date().toLocaleString('zh-TW'),
+        likes: [],
+        comments: []
+      };
+      state.posts.unshift(post);
+      save();
+      postImgData = '';
+      showToast('🎉 貼文發布成功！');
+      goHome();
+    }
+
+    // ===== RENDER MY POSTS =====
+    function renderMyPosts() {
+      const u = state.currentUser;
+      const myPosts = state.posts.filter(p => p.authorId === u.id);
+      const container = document.getElementById('my-posts-container');
+      if (!myPosts.length) {
+        container.innerHTML = `<div class="my-posts-empty"><div class="empty-icon">🌿</div><p>還沒有貼文，快來分享你的毛孩故事！</p></div>`;
+        return;
+      }
+      container.innerHTML = '<div style="display:flex;flex-direction:column;gap:12px">' +
+        myPosts.map(p => `
+      <div class="mini-post-card">
+        <div class="mini-post-icon">📝</div>
+        <div>
+          <div class="mini-post-topic">${esc(p.topic)}</div>
+          <div class="mini-post-content">${esc(p.content).substring(0, 60)}${p.content.length > 60 ? '...' : ''}</div>
+          <div class="mini-post-time">🕐 ${p.time} · ❤️ ${p.likes.length} · 💬 ${p.comments.length}</div>
+        </div>
+      </div>
+    `).join('') + '</div>';
+    }
+
+    // ===== RENDER FEED =====
+    function renderFeed() {
+      const feed = document.getElementById('posts-feed');
+      if (!state.posts.length) {
+        feed.innerHTML = `<div class="feed-empty"><span class="empty-emoji">🌿</span><p>還沒有人發文，快成為第一位！</p></div>`;
+        return;
+      }
+      feed.innerHTML = state.posts.map(p => renderPostCard(p)).join('');
+    }
+
+    function renderPostCard(post) {
+      const liked = state.currentUser && post.likes.includes(state.currentUser.id);
+      const comments = post.comments.map(c => `
+    <div class="comment-item">
+      <img class="comment-avatar" src="${c.authorAvatar}" alt="">
+      <div class="comment-body">
+        <div class="comment-author">${esc(c.authorName)} <span style="color:var(--text-light);font-weight:400;font-size:0.78rem">@${esc(c.authorId)}</span></div>
+        <div class="comment-text">${esc(c.text)}</div>
+      </div>
+    </div>
+  `).join('');
+
+      const commentInput = state.currentUser ? `
+    <div class="comment-input-row">
+      <img style="width:32px;height:32px;border-radius:50%;border:2px solid var(--peach-light);object-fit:cover;flex-shrink:0" src="${state.currentUser.avatar || DEFAULT_AVATAR}" alt="">
+      <input class="comment-input" id="ci-${post.id}" placeholder="說點什麼..." onkeydown="if(event.key==='Enter')sendComment('${post.id}')">
+      <button class="comment-send" onclick="sendComment('${post.id}')">🚀</button>
+    </div>
+  ` : `
+    <div class="login-prompt">
+      <p>💬 想留言請先登入 / 註冊</p>
+      <div class="login-prompt-btns">
+        <button class="lp-btn yes" onclick="showLoginModal()">🔑 前往登入</button>
+        <button class="lp-btn no" onclick="closeComments('${post.id}')">稍後再說</button>
+      </div>
+    </div>
+  `;
+
+      return `
+    <div class="post-card" id="card-${post.id}">
+      <div class="post-card-header">
+        <img class="post-author-avatar" src="${post.authorAvatar}" alt="">
+        <div class="post-author-info">
+          <div class="post-author-name">${esc(post.authorName)}</div>
+          <div class="post-author-id">@${esc(post.authorId)}</div>
+        </div>
+        <div class="post-time">${post.time}</div>
+      </div>
+      <div class="post-card-body">
+        <div class="post-topic">${esc(post.topic)}</div>
+        <div class="post-content">${esc(post.content)}</div>
+        ${post.image ? `<img class="post-image" src="${post.image}" alt="貼文圖片">` : ''}
+      </div>
+      <div class="post-card-actions">
+        <button class="action-btn ${liked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+          <span class="icon">${liked ? '❤️' : '🤍'}</span> ${post.likes.length}
+        </button>
+        <button class="action-btn" onclick="toggleComments('${post.id}')">
+          <span class="icon">💬</span> ${post.comments.length}
+        </button>
+      </div>
+      <div class="comments-section" id="cs-${post.id}">
+        ${post.comments.length ? `<div class="comment-list">${comments}</div>` : `<div class="comment-list" id="cl-${post.id}"></div>`}
+        ${commentInput}
+      </div>
+    </div>
+  `;
+    }
+
+    // ===== LIKE =====
+    function toggleLike(postId) {
+      if (!state.currentUser) { showLoginModal(); return; }
+      const post = state.posts.find(p => p.id === postId); if (!post) return;
+      const uid = state.currentUser.id;
+      if (post.likes.includes(uid)) post.likes = post.likes.filter(l => l !== uid);
+      else post.likes.push(uid);
+      save();
+      // re-render card
+      const card = document.getElementById('card-' + postId);
+      if (card) card.outerHTML = renderPostCard(post);
+      // re-render if cs was open
+    }
+
+    // ===== COMMENTS =====
+    function toggleComments(postId) {
+      const cs = document.getElementById('cs-' + postId);
+      if (cs) cs.classList.toggle('open');
+    }
+
+    function closeComments(postId) {
+      const cs = document.getElementById('cs-' + postId);
+      if (cs) cs.classList.remove('open');
+    }
+
+    function sendComment(postId) {
+      if (!state.currentUser) { showLoginModal(); return; }
+      const input = document.getElementById('ci-' + postId);
+      const text = input.value.trim(); if (!text) return;
+      const post = state.posts.find(p => p.id === postId); if (!post) return;
+      const u = state.currentUser;
+      post.comments.push({
+        authorId: u.id, authorName: u.name,
+        authorAvatar: u.avatar || DEFAULT_AVATAR, text,
+        time: new Date().toLocaleString('zh-TW')
+      });
+      save();
+      // re-render card keeping comments open
+      const card = document.getElementById('card-' + postId);
+      if (card) {
+        card.outerHTML = renderPostCard(post);
+        const newCs = document.getElementById('cs-' + postId);
+        if (newCs) newCs.classList.add('open');
+      }
+      showToast('💬 留言已送出！');
+    }
+
+    // ===== MODAL =====
+    function showLoginModal() {
+      document.getElementById('modal-icon').textContent = '🐾';
+      document.getElementById('modal-title').textContent = '是否有平台帳號？';
+      document.getElementById('modal-body').textContent = '登入後即可按讚、留言，與毛孩主人們互動！';
+      document.getElementById('modal-btns').innerHTML = `
+    <button class="modal-btn yes" onclick="closeModal();goPage('auth')">🔑 前往登入 / 註冊</button>
+    <button class="modal-btn no" onclick="closeModal()">稍後再說</button>
+  `;
+      document.getElementById('modal').classList.add('open');
+    }
+    function closeModal() { document.getElementById('modal').classList.remove('open'); }
+    document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+    // ===== TOAST =====
+    let toastTimer;
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // ===== UTILS =====
+    function esc(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // ===== INIT: check guest mode =====
+    // Add guest share button to auth page
+    document.querySelector('#page-auth').insertAdjacentHTML('beforeend',
+      `<div style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:10;">
+    <button onclick="openGuestShare()" style="background:rgba(255,255,255,0.9);border:2px solid var(--peach);border-radius:50px;padding:10px 22px;font-family:'Nunito',sans-serif;font-weight:700;color:var(--text-mid);cursor:pointer;box-shadow:0 4px 16px rgba(139,94,60,0.15);font-size:0.88rem;transition:all 0.2s;"
+      onmouseover="this.style.background='var(--peach-light)'"
+      onmouseout="this.style.background='rgba(255,255,255,0.9)'">
+      👀 不登入，先逛逛分享廣場
+    </button>
+  </div>`
+    );
+  </script>
+</body>
+
+</html>
